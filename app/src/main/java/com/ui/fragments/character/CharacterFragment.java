@@ -4,29 +4,30 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.model.CharacterModel;
-import com.model.RickAndMortyResponse;
+import com.base.BaseFragment;
 import com.ui.activity.R;
 import com.ui.activity.databinding.FragmentCharacterBinding;
 import com.ui.adapters.CharacterAdapter;
 
 import org.jetbrains.annotations.NotNull;
 
-public class CharacterFragment extends Fragment {
+
+public class CharacterFragment extends BaseFragment<CharacterViewModel, FragmentCharacterBinding> {
 
     private CharacterViewModel viewModel;
     private FragmentCharacterBinding binding;
+
     private final CharacterAdapter characterAdapter = new CharacterAdapter();
+    private LinearLayoutManager linearLayoutManager;
 
     @Nullable
     @Override
@@ -36,33 +37,51 @@ public class CharacterFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initialize();
-        setupCharacterRecycler();
-        setupRequests();
-    }
-
-
-    private void initialize() {
+    protected void initialize() {
+        super.initialize();
         viewModel = new ViewModelProvider(requireActivity()).get(CharacterViewModel.class);
+        setupCharacterRecycler();
     }
 
     private void setupCharacterRecycler() {
-        binding.recyclerCharacter.setLayoutManager(new LinearLayoutManager(requireContext()));
+        linearLayoutManager = new LinearLayoutManager(getContext());
+        binding.recyclerCharacter.setLayoutManager(linearLayoutManager);
         binding.recyclerCharacter.setAdapter(characterAdapter);
-
 //        characterAdapter.setOnItemClickListener(position -> {
 //            Navigation.
 //                    findNavController(requireActivity(), R.id.nav_host_fragment).navigate(
-//                    CharacterFragmentDirections.actionCharacterFragmentToCharacterDetailFragment().setPosition(position));
+//                    CharacterFragmentDirections.actionCharacterFragmentToCharacterDetailFragment()
+//                            .setPosition(position));
 //        });
     }
-    private void setupRequests() {
-         viewModel.fetchCharacter().observe(getViewLifecycleOwner(), new Observer<RickAndMortyResponse<CharacterModel>>() {
-             @Override
-             public void onChanged(RickAndMortyResponse<CharacterModel> characterModelRickAndMortyResponse) {
-                 characterAdapter.addList(characterModelRickAndMortyResponse.getResults());             }
-         });
+
+    private int visibleItemCount;
+    private int totalItemCount;
+    private int pastVisiblesItems;
+
+    @Override
+    protected void setupRequests() {
+        super.setupRequests();
+        viewModel.fetchCharacter().observe(getViewLifecycleOwner(), characterModelRickAndMortyResponse -> {
+            characterAdapter.submitList(characterModelRickAndMortyResponse.getResults());
+        });
+
+        binding.recyclerCharacter.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0) {
+                    visibleItemCount = linearLayoutManager.getChildCount();
+                    totalItemCount = linearLayoutManager.getItemCount();
+                    pastVisiblesItems = linearLayoutManager.findFirstVisibleItemPosition();
+                    if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                        viewModel.page++;
+                        viewModel.fetchCharacter().observe(getViewLifecycleOwner(), characterModelRickAndMortyResponse -> {
+                            characterAdapter.submitList(characterModelRickAndMortyResponse.getResults());
+                        });
+                    }
+                }
+            }
+        });
     }
 }

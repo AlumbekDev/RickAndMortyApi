@@ -1,9 +1,15 @@
 package com.model;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Objects;
+
+@Entity
 public class CharacterModel {
 
+    @PrimaryKey(autoGenerate = true)
     @SerializedName("id")
     private int id;
 
@@ -12,6 +18,50 @@ public class CharacterModel {
 
     @SerializedName("image")
     private String image;
+
+    @SerializedName("status")
+    private String status;
+
+    @SerializedName("species")
+    private String species;
+
+    @SerializedName("type")
+    private String type;
+
+    @SerializedName("gender")
+    private String gender;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getSpecies() {
+        return species;
+    }
+
+    public void setSpecies(String species) {
+        this.species = species;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
 
     public String getImage() {
         return image;
@@ -35,5 +85,24 @@ public class CharacterModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CharacterModel that = (CharacterModel) o;
+        return id == that.id &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(image, that.image) &&
+                Objects.equals(status, that.status) &&
+                Objects.equals(species, that.species) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(gender, that.gender);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, image, status, species, type, gender);
     }
 }

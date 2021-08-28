@@ -27,6 +27,4 @@ public class RickAndMortyResponse<T> {
     public void setResults(ArrayList<T> results) {
         this.results = results;
     }
-
-
 }

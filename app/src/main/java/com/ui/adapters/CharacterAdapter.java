@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.model.CharacterModel;
-import com.ui.activity.R;
 import com.ui.activity.databinding.ItemCharacterBinding;
 
 import org.jetbrains.annotations.NotNull;
@@ -17,17 +16,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.CharacterViewHolder> {
-
-    private ItemCharacterBinding binding;
-    public ArrayList<CharacterModel> list = new ArrayList<>();
-    //private OnItemClickListener listener;
+    private ArrayList<CharacterModel> list = new ArrayList<>();
 
     @NonNull
     @NotNull
     @Override
     public CharacterViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        binding = ItemCharacterBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new CharacterViewHolder(binding.getRoot());
+        return new CharacterViewHolder(ItemCharacterBinding
+                .inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
@@ -40,34 +36,25 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
         return list.size();
     }
 
-    public void addList(ArrayList<CharacterModel> models) {
-        this.list = models;
+    public void submitList(ArrayList<CharacterModel> results) {
+        this.list = results;
         notifyDataSetChanged();
-
     }
 
-    class CharacterViewHolder extends RecyclerView.ViewHolder {
-
-
-        public CharacterViewHolder(@NonNull View itemView) {
-            super(itemView);
-//            binding.getRoot().setOnClickListener(v -> {
-//                listener.OnItemClick(getAdapterPosition());
-//            });
+    public class CharacterViewHolder extends RecyclerView.ViewHolder {
+        ItemCharacterBinding binding;
+        public CharacterViewHolder(@NonNull @NotNull ItemCharacterBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
-        private void onBind(CharacterModel item) {
-            Glide.with(binding.imageItemCharacter).load(item.getImage()).into(binding.imageItemCharacter);
-            binding.textItemCharactersNaem.setText(item.getName());
+        private void onBind(CharacterModel model){
+            Glide.with(binding.imageItemCharacter)
+                    .load(model.getImage())
+                    .into(binding.imageItemCharacter);
+            binding.textItemCharactersNaem.setText(model.getName());
         }
     }
+
+
 }
-
-//    public interface OnItemClickListener {
-//        void OnItemClick(int position);
-//    }
-//
-//    public void setOnItemClickListener(OnItemClickListener listener) {
-//        this.listener = listener;
-//    }
-//}

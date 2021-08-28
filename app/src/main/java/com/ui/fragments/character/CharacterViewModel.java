@@ -3,29 +3,27 @@ package com.ui.fragments.character;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.App;
+import com.base.BaseViewModel;
+import com.data.repositories.CharacterRepository;
 import com.model.CharacterModel;
 import com.model.RickAndMortyResponse;
-import com.ui.App;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CharacterViewModel extends ViewModel {
+public class CharacterViewModel extends BaseViewModel {
+public int page = 1;
+    private final CharacterRepository repository = new CharacterRepository();
 
-    MutableLiveData<RickAndMortyResponse<CharacterModel>> fetchCharacter() {
-        MutableLiveData<RickAndMortyResponse<CharacterModel>> data = new MutableLiveData<>();
-        App.characterApiService.fetchCharacters().enqueue(new Callback<RickAndMortyResponse<CharacterModel>>() {
-            @Override
-            public void onResponse(Call<RickAndMortyResponse<CharacterModel>> call, Response<RickAndMortyResponse<CharacterModel>> response) {
-                data.setValue(response.body());
-            }
+    MutableLiveData<RickAndMortyResponse<CharacterModel>> fetchCharacter(){
+        return repository.fetchCharacters(page);
+    }
 
-            @Override
-            public void onFailure(Call<RickAndMortyResponse<CharacterModel>> call, Throwable t) {
-                data.setValue(null);
-            }
-        });
-        return data;
+    public MutableLiveData<CharacterModel> fetchData(int id) {
+        return repository.fetchData(id);
     }
 }
