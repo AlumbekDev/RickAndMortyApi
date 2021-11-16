@@ -1,2 +1,2 @@
-rootProject.name = "lesson2Api"
+rootProject.name = "lesson2Api" /
 include ':app'
